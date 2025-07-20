@@ -2,14 +2,8 @@ from fastapi import FastAPI, HTTPException
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from books.spiders.media_spider import MediaSpider
-from twisted.internet.asyncioreactor import AsyncioSelectorReactor
-from twisted.internet import reactor
 import logging
 from pydantic import HttpUrl
-
-# Cài đặt AsyncioSelectorReactor
-reactor = AsyncioSelectorReactor()
-reactor.install()
 
 app = FastAPI()
 logging.basicConfig(level=logging.DEBUG)
@@ -50,7 +44,7 @@ class ResultPipeline:
 @app.post("/scrape")
 async def scrape(url: HttpUrl):
     if not str(url).startswith(('http://', 'https://')):
-        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://")
+        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://"))
 
     result = await run_spider(str(url))
     if not result.image_urls:
