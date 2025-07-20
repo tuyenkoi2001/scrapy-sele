@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
+from books.spiders.media_spider import MediaSpider  # Thêm import
 import crochet
 import logging
 from typing import List
