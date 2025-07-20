@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-from books.spiders.media_spider import MediaSpider  # Thêm import
+from books.spiders.media_spider import MediaSpider
 import crochet
 import logging
 from typing import List
@@ -32,8 +32,8 @@ def run_spider(start_url: str) -> ScrapeResult:
         settings.set('ITEM_PIPELINES', {'__main__.ResultPipeline': 100}, priority='cmdline')
         settings.set('DOWNLOAD_TIMEOUT', 600)
         process = CrawlerProcess(settings)
-        crawler = process.create_crawler(MediaSpider, start_url=start_url, result=result)
-        process.crawl(crawler)
+        crawler = process.create_crawler(MediaSpider)
+        process.crawl(crawler, start_url=start_url, result=result)
         process.start()
         return result
     except Exception as e:
