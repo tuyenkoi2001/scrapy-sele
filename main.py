@@ -50,7 +50,7 @@ class ResultPipeline:
 @app.post("/scrape")
 async def scrape(url: HttpUrl):
     if not str(url).startswith(('http://', 'https://')):
-        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://"))
+        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://")
 
     result = await run_spider(str(url))
     if not result.image_urls:
