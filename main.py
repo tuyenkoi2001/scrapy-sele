@@ -50,12 +50,12 @@ async def scrape(url: HttpUrl):
     if not str(url).startswith(('http://', 'https://')):
         raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://")
 
-    result = run_spider(str(url))
-    result.wait(timeout=600)
-    if not result.result.image_urls:
+    eventual_result = run_spider(str(url))
+    result = eventual_result.result()  # Lấy kết quả từ EventualResult
+    if not result.image_urls:
         raise HTTPException(status_code=404, detail="No images found on the provided URL")
     
-    return {"image_urls": result.result.image_urls}
+    return {"image_urls": result.image_urls}
 
 @app.get("/scrape")
 async def scrape_get(url: HttpUrl):
