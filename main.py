@@ -4,7 +4,6 @@ from scrapy.utils.project import get_project_settings
 from books.spiders.media_spider import MediaSpider
 import crochet
 import logging
-from typing import List
 from pydantic import HttpUrl
 
 crochet.setup()
@@ -51,7 +50,7 @@ async def scrape(url: HttpUrl):
         raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://")
 
     eventual_result = run_spider(str(url))
-    result = eventual_result.result()  # Lấy kết quả từ EventualResult
+    result = eventual_result.wait(timeout=600)  # Chờ và lấy kết quả
     if not result.image_urls:
         raise HTTPException(status_code=404, detail="No images found on the provided URL")
     
