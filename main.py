@@ -2,11 +2,15 @@ from fastapi import FastAPI, HTTPException
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from books.spiders.media_spider import MediaSpider
-import crochet
+from twisted.internet.asyncioreactor import AsyncioSelectorReactor
+from twisted.internet import reactor
 import logging
 from pydantic import HttpUrl
 
-crochet.setup()
+# Cài đặt AsyncioSelectorReactor
+reactor = AsyncioSelectorReactor()
+reactor.install()
+
 app = FastAPI()
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,8 +26,7 @@ class ScrapeResult:
 async def root():
     return {"status": "API is running"}
 
-@crochet.run_in_reactor
-def run_spider(start_url: str) -> ScrapeResult:
+async def run_spider(start_url: str) -> ScrapeResult:
     result = ScrapeResult()
     logging.debug(f"Starting spider for URL: {start_url}")
     try:
@@ -32,7 +35,7 @@ def run_spider(start_url: str) -> ScrapeResult:
         settings.set('DOWNLOAD_TIMEOUT', 600)
         process = CrawlerProcess(settings)
         crawler = process.create_crawler(MediaSpider)
-        process.crawl(crawler, start_url=start_url, result=result)
+        await process.crawl(crawler, start_url=start_url, result=result)
         process.start()
         return result
     except Exception as e:
@@ -47,10 +50,9 @@ class ResultPipeline:
 @app.post("/scrape")
 async def scrape(url: HttpUrl):
     if not str(url).startswith(('http://', 'https://')):
-        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://")
+        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://"))
 
-    eventual_result = run_spider(str(url))
-    result = eventual_result.wait(timeout=600)  # Chờ và lấy kết quả
+    result = await run_spider(str(url))
     if not result.image_urls:
         raise HTTPException(status_code=404, detail="No images found on the provided URL")
     

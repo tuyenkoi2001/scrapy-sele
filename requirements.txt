@@ -1,7 +1,6 @@
 fastapi 
 uvicorn 
-scrapy 
-crochet 
-selenium 
+scrapy==2.13.3 
+selenium==4.18.1 
 webdriver-manager 
 pydantic
